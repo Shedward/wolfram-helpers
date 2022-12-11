@@ -17,7 +17,8 @@ InvMix[a, b] represents operator form of InvMix";
 InvLerp::usage = "Alias for InvMix";
 
 
-Frac::usage = "Frac[x] returns the fractional portion of value";
+Frac::usage = 
+"Frac[x] returns the fractional portion of value";
 
 
 Remap::usage = 
@@ -29,7 +30,8 @@ FragImage::usage =
 "FragImage[f, ...] create an Image rendered by function f[x, y], ";
 
 
-AnimatedFragImage::usage = "AnimatedFragImage[frag, t] render AnimatedImage based on fragment iterating over t from 0 to 1 with step 0.05
+AnimatedFragImage::usage = 
+"AnimatedFragImage[frag, t] render AnimatedImage based on fragment iterating over t from 0 to 1 with step 0.05
 AnimatedFragImage[frag, {t, tmin, tmax}] render AnimatedImage over specific range of t
 AnimatedFragImage[frag, {t, tmin, tmax, tstep}] render AnimatedImage over specific range and spet";
 
