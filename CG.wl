@@ -3,36 +3,35 @@
 BeginPackage["CG`"];
 
 
-Mix::usage = "
-Mix[a, b, t] returns the linear interpolation of a and b based on weight w. \\
-a and b are either both scalars or both vectors of the same length. \
-The weight w may be a scalar or a vector of the same length as a and b. \
-w can be any value (so is not restricted to be between zero and one); \ 
-If w has values outside the [0,1] range, it actually extrapolates. \
-";
-Lerp::usage = "
-Alias for Mix
-";
+Mix::usage = 
+"Mix[a, b, t] return linear interpolation of a and b based on weight t.
+Mix[a, b] represents operator form of Mix";
+
+Lerp::usage = "Alias for Mix";
 
 
-InvMix::usage = "
-InvMix[a, b, v] returns a measure of value between a and b \
-where 0.0 means value is equal to a and 1.0 means values is equal to b
-";
-InvLerp::usage = "
-Alias for InvMix
-";
+InvMix::usage = 
+"InvMix[a, b, v] returns a weight of linear interpolation for value v
+InvMix[a, b] represents operator form of InvMix";
+
+InvLerp::usage = "Alias for InvMix";
 
 
-Frac::usage = "
-Frac[x] returns the fractional portion of value
-";
+Frac::usage = "Frac[x] returns the fractional portion of value";
 
 
-Remap::usage = "
-Remap[mini, maxi, mino, maxo, v] returns a value in scale mino-maxo \
-keeping the same relative position as v have in scale mini-maxi
-";
+Remap::usage = 
+"Remap[mini, maxi, mino, maxo, v] returns a value in scale mino-maxo \
+keeping the same relative position as v have in scale mini-maxi";
+
+
+FragImage::usage = 
+"FragImage[f, ...] create an Image rendered by function f[x, y], ";
+
+
+AnimatedFragImage::usage = "AnimatedFragImage[frag, t] render AnimatedImage based on fragment iterating over t from 0 to 1 with step 0.05
+AnimatedFragImage[frag, {t, tmin, tmax}] render AnimatedImage over specific range of t
+AnimatedFragImage[frag, {t, tmin, tmax, tstep}] render AnimatedImage over specific range and spet";
 
 
 Begin["`Private`"];
@@ -49,10 +48,38 @@ InvLerp = InvMix;
 
 
 Remap[mini_, maxi_, mino_, maxo_, v_] := Mix[mino, maxo] @* InvMix[mini, maxi] @ v;
-Remap[mini_, maxi_, mino_, maxo_] := Remap[mini, maxi, mino, maxo];
+Remap[mini_, maxi_, mino_, maxo_] := Remap[mini, maxi, mino, maxo, #]&;
 
 
 Frac[x_]:= x - Floor[x];
+
+
+FragImage[
+	frag_Function, 
+	OptionsPattern[{
+		"Size" -> {200, 200},
+		"Range" -> {-1, 1},
+		"ColorSpace" -> "Automatic"
+	}]
+]:= Module[
+	{min, max, sizex, sizey},
+
+	{min, max} = OptionValue["Range"];
+	{sizex, sizey} = OptionValue["Size"];
+
+	Image[
+		Table[
+			frag[x, y], 
+			{x, min, max, (max - min) / sizex}, 
+			{y, min, max, (max - min) / sizey}
+		],
+		ColorSpace -> OptionValue["ColorSpace"]
+	]
+];
+
+
+AnimatedFragImage[frag_, {t_, tmin_, tmax_, tstep_:0.05}, args___] := AnimatedImage[Table[FragImage[frag, args], {t, tmin, tmax, tstep}]];
+AnimatedFragImage[frag_, t_, args___] := AnimatedFragImage[frag, {t, 0, 1, 0.05}, args];
 
 
 End[];
